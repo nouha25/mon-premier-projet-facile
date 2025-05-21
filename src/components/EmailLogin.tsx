@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { Mail } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface EmailLoginProps {
   onLogin: (email: string) => void;
@@ -28,29 +30,39 @@ const EmailLogin: React.FC<EmailLoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-bold text-center mb-6">
-            Gestion des Bastions
-          </h2>
-          <p className="text-center text-muted-foreground mb-6">
-            Entrez votre adresse e-mail pour voir les bastions associés
-          </p>
-        </div>
-        <Input
-          type="email"
-          placeholder="Adresse e-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full"
-          required
-        />
-        <Button type="submit" className="w-full">
-          Accéder
-        </Button>
-      </form>
-    </div>
+    <Card className="w-full max-w-md mx-auto shadow-lg border-slate-200">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">
+          Gestion des Bastions
+        </CardTitle>
+        <CardDescription className="text-center">
+          Entrez votre adresse e-mail pour voir les bastions associés
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center border rounded-md focus-within:ring-1 focus-within:ring-primary focus-within:border-primary bg-white overflow-hidden">
+            <div className="px-3 py-2 text-muted-foreground">
+              <Mail className="h-5 w-5" />
+            </div>
+            <Input
+              type="email"
+              placeholder="Adresse e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              required
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full transition-all hover:shadow-md"
+          >
+            Accéder
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
