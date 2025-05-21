@@ -1,7 +1,6 @@
-
 import axios from "axios";
-import { BastionDto, ActionRequest } from "../types";
-import { mockPendingBastions, mockBastionHistory, mockColleagueHistory, mockSubscriptions } from "./mockData";
+import { BastionDto, ActionRequest, BastionAction } from "../types";
+import { mockPendingBastions, mockBastionHistory, mockColleagueHistory, mockSubscriptions, mockBastionActions } from "./mockData";
 import { toast } from "@/hooks/use-toast";
 
 // TODO: Remplacer par l'URL réelle de votre API quand elle sera disponible
@@ -39,13 +38,40 @@ export const api = {
     }
   },
 
-  // Récupérer l'historique des bastions pour un utilisateur
-  getBastionHistory: async (email: string): Promise<BastionDto[]> => {
+  // Récupérer l'historique personnel des bastions pour un utilisateur
+  getPersonalBastionHistory: async (email: string): Promise<BastionDto[]> => {
     if (USE_MOCK_DATA) {
       await new Promise(resolve => setTimeout(resolve, 700));
-      return [...mockBastionHistory, ...mockColleagueHistory];
+      return mockBastionHistory.map(bastion => ({
+        ...bastion,
+        userEmail: email
+      }));
     } else {
-      const response = await axios.get(`${API_URL}/Bastions/user/${email}/history`);
+      const response = await axios.get(`${API_URL}/Bastions/user/${email}/personal-history`);
+      return response.data;
+    }
+  },
+
+  // Récupérer un bastion par son ID
+  getBastionById: async (bastionId: string): Promise<BastionDto | null> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const allBastions = [...mockPendingBastions, ...mockBastionHistory, ...mockColleagueHistory];
+      const bastion = allBastions.find(b => b.bastionId === bastionId);
+      return bastion || null;
+    } else {
+      const response = await axios.get(`${API_URL}/Bastions/${bastionId}`);
+      return response.data;
+    }
+  },
+
+  // Récupérer les actions pour un bastion spécifique
+  getBastionActions: async (bastionId: string): Promise<BastionAction[]> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      return mockBastionActions.filter(action => action.bastionId === bastionId);
+    } else {
+      const response = await axios.get(`${API_URL}/Bastions/${bastionId}/actions`);
       return response.data;
     }
   },
@@ -75,23 +101,26 @@ export const api = {
     }
   },
 
-  // Recherche dans l'historique des bastions
-  searchBastionHistory: async (email: string, query: string): Promise<BastionDto[]> => {
+  // Recherche dans l'historique personnel des bastions
+  searchPersonalHistory: async (email: string, query: string): Promise<BastionDto[]> => {
     if (USE_MOCK_DATA) {
       await new Promise(resolve => setTimeout(resolve, 600));
-      const allHistory = [...mockBastionHistory, ...mockColleagueHistory];
+      const personalHistory = mockBastionHistory.map(bastion => ({
+        ...bastion,
+        userEmail: email
+      }));
       
-      if (!query) return allHistory;
+      if (!query) return personalHistory;
       
       const lowerQuery = query.toLowerCase();
-      return allHistory.filter(bastion => 
+      return personalHistory.filter(bastion => 
         bastion.name.toLowerCase().includes(lowerQuery) || 
         bastion.bastionId.toLowerCase().includes(lowerQuery) ||
         bastion.subscription.toLowerCase().includes(lowerQuery) ||
         (bastion.ritm && bastion.ritm.toLowerCase().includes(lowerQuery))
       );
     } else {
-      const response = await axios.get(`${API_URL}/Bastions/user/${email}/search?query=${query}`);
+      const response = await axios.get(`${API_URL}/Bastions/user/${email}/personal-history/search?query=${query}`);
       return response.data;
     }
   }

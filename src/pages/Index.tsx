@@ -7,13 +7,15 @@ import { useBastions } from "@/hooks/useBastions";
 import { LogOut } from "lucide-react";
 import { api } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClipboardList, History } from "lucide-react";
 
 const Index = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const {
     pendingBastions,
-    bastionHistory,
+    personalHistory,
     isLoading,
     ritmNumber,
     setRitmNumber,
@@ -98,26 +100,41 @@ const Index = () => {
                 <p className="text-muted-foreground">Chargement des données...</p>
               </div>
             ) : (
-              <>
-                <div className="bg-white p-6 rounded-lg shadow border border-slate-100">
-                  <PendingBastions
-                    bastions={pendingBastions}
-                    onKeep={handleKeepAction}
-                    onDelete={handleDeleteAction}
-                    ritmNumber={ritmNumber}
-                    setRitmNumber={setRitmNumber}
-                    isUpdating={isUpdating}
-                  />
-                </div>
+              <Tabs defaultValue="pending" className="w-full">
+                <TabsList className="w-full mb-6">
+                  <TabsTrigger value="pending" className="flex items-center gap-2 w-1/2">
+                    <ClipboardList className="h-4 w-4" />
+                    Bastions en attente
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="flex items-center gap-2 w-1/2">
+                    <History className="h-4 w-4" />
+                    Historique
+                  </TabsTrigger>
+                </TabsList>
                 
-                <div className="bg-white p-6 rounded-lg shadow border border-slate-100">
-                  <BastionHistory 
-                    bastions={bastionHistory} 
-                    onSearch={handleSearch}
-                    isLoading={isLoading}
-                  />
-                </div>
-              </>
+                <TabsContent value="pending" className="mt-6">
+                  <div className="bg-white p-6 rounded-lg shadow border border-slate-100">
+                    <PendingBastions
+                      bastions={pendingBastions}
+                      onKeep={handleKeepAction}
+                      onDelete={handleDeleteAction}
+                      ritmNumber={ritmNumber}
+                      setRitmNumber={setRitmNumber}
+                      isUpdating={isUpdating}
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="history" className="mt-6">
+                  <div className="bg-white p-6 rounded-lg shadow border border-slate-100">
+                    <BastionHistory 
+                      bastions={personalHistory} 
+                      onSearch={handleSearch}
+                      isLoading={isLoading}
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
             )}
           </div>
         )}

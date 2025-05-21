@@ -18,10 +18,10 @@ export const useBastions = (email: string | null) => {
     enabled: !!email,
   });
 
-  // Requête pour récupérer l'historique des bastions
-  const bastionHistoryQuery = useQuery({
-    queryKey: ["bastionHistory", email, searchQuery],
-    queryFn: () => (email ? api.searchBastionHistory(email, searchQuery) : Promise.resolve([])),
+  // Requête pour récupérer l'historique personnel des bastions
+  const personalHistoryQuery = useQuery({
+    queryKey: ["personalHistory", email, searchQuery],
+    queryFn: () => (email ? api.searchPersonalHistory(email, searchQuery) : Promise.resolve([])),
     enabled: !!email,
   });
 
@@ -33,7 +33,7 @@ export const useBastions = (email: string | null) => {
       setSelectedBastion(null);
       setRitmNumber("");
       queryClient.invalidateQueries({ queryKey: ["pendingBastions"] });
-      queryClient.invalidateQueries({ queryKey: ["bastionHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["personalHistory"] });
       toast({
         title: "Action réalisée avec succès",
         description: "Le statut du bastion a été mis à jour.",
@@ -87,9 +87,9 @@ export const useBastions = (email: string | null) => {
 
   return {
     pendingBastions: pendingBastionsQuery.data || [],
-    bastionHistory: bastionHistoryQuery.data || [],
-    isLoading: pendingBastionsQuery.isLoading || bastionHistoryQuery.isLoading,
-    isError: pendingBastionsQuery.isError || bastionHistoryQuery.isError,
+    personalHistory: personalHistoryQuery.data || [],
+    isLoading: pendingBastionsQuery.isLoading || personalHistoryQuery.isLoading,
+    isError: pendingBastionsQuery.isError || personalHistoryQuery.isError,
     selectedBastion,
     setSelectedBastion,
     ritmNumber,

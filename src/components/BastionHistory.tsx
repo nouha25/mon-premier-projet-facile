@@ -1,4 +1,5 @@
 
+import { useNavigate } from "react-router-dom";
 import { BastionDto } from "../types";
 import { 
   Table, 
@@ -24,13 +25,19 @@ const BastionHistory: React.FC<BastionHistoryProps> = ({
   onSearch,
   isLoading 
 }) => {
+  const navigate = useNavigate();
+
+  const handleBastionClick = (bastionId: string) => {
+    navigate(`/bastion/${bastionId}`);
+  };
+
   if (isLoading) {
     return (
       <Card className="bg-white shadow-sm border-slate-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Historique des actions
+            Mon historique d'actions
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -49,7 +56,7 @@ const BastionHistory: React.FC<BastionHistoryProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Historique des actions
+            Mon historique d'actions
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -67,7 +74,7 @@ const BastionHistory: React.FC<BastionHistoryProps> = ({
       <CardHeader className="pb-2">
         <CardTitle className="text-xl font-semibold text-primary flex items-center gap-2">
           <History className="h-5 w-5" />
-          Historique des actions
+          Mon historique d'actions
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -83,12 +90,16 @@ const BastionHistory: React.FC<BastionHistoryProps> = ({
                   <TableHead className="font-medium">Subscription</TableHead>
                   <TableHead className="font-medium">Statut</TableHead>
                   <TableHead className="font-medium">RITM</TableHead>
-                  <TableHead className="font-medium">Par</TableHead>
+                  <TableHead className="font-medium">Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {bastions.map((bastion) => (
-                  <TableRow key={bastion.bastionId} className="hover:bg-muted/30">
+                  <TableRow 
+                    key={bastion.bastionId} 
+                    className="hover:bg-muted/30 cursor-pointer"
+                    onClick={() => handleBastionClick(bastion.bastionId)}
+                  >
                     <TableCell className="font-medium">{bastion.name}</TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">{bastion.bastionId}</TableCell>
                     <TableCell>{bastion.subscription}</TableCell>
@@ -107,13 +118,7 @@ const BastionHistory: React.FC<BastionHistoryProps> = ({
                       {bastion.ritm || "-"}
                     </TableCell>
                     <TableCell>
-                      {bastion.userEmail ? (
-                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
-                          {bastion.userEmail}
-                        </span>
-                      ) : (
-                        <span className="text-xs">Vous</span>
-                      )}
+                      {bastion.actionDate ? new Date(bastion.actionDate).toLocaleDateString() : "-"}
                     </TableCell>
                   </TableRow>
                 ))}

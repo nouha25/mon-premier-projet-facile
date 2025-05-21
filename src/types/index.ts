@@ -6,6 +6,7 @@ export interface BastionDto {
   status: string;
   ritm?: string; // Pour stocker le numéro RITM si "keep" est choisi
   userEmail?: string; // Pour identifier qui a effectué l'action
+  actionDate?: string; // Date de l'action
 }
 
 export interface ContactDto {
@@ -23,4 +24,15 @@ export interface ActionRequest {
 export interface User {
   email: string;
   name?: string;
+}
+
+// Nouvelle interface pour le suivi des actions sur un bastion
+export interface BastionAction {
+  actionId: string;
+  bastionId: string;
+  action: "keep" | "delete";
+  ritm?: string;
+  userEmail: string;
+  userName?: string;
+  actionDate: string;
 }
