@@ -8,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 interface EmailLoginProps {
   onLogin: (email: string) => void;
+  isLoading?: boolean;
 }
 
-const EmailLogin: React.FC<EmailLoginProps> = ({ onLogin }) => {
+const EmailLogin: React.FC<EmailLoginProps> = ({ onLogin, isLoading = false }) => {
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -52,14 +53,27 @@ const EmailLogin: React.FC<EmailLoginProps> = ({ onLogin }) => {
               onChange={(e) => setEmail(e.target.value)}
               className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
               required
+              disabled={isLoading}
             />
           </div>
           <Button 
             type="submit" 
             className="w-full transition-all hover:shadow-md"
+            disabled={isLoading}
           >
-            Accéder
+            {isLoading ? (
+              <>
+                <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Connexion...
+              </>
+            ) : (
+              "Accéder"
+            )}
           </Button>
+          
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            <p>Emails de test: alice@example.com, bob@example.com, charlie@example.com</p>
+          </div>
         </form>
       </CardContent>
     </Card>

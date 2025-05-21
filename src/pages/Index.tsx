@@ -1,14 +1,16 @@
 
 import { useState } from "react";
-import { Toaster } from "@/components/ui/toaster";
 import EmailLogin from "@/components/EmailLogin";
 import PendingBastions from "@/components/PendingBastions";
 import BastionHistory from "@/components/BastionHistory";
 import { useBastions } from "@/hooks/useBastions";
 import { LogOut } from "lucide-react";
+import { api } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [email, setEmail] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const {
     pendingBastions,
     bastionHistory,
@@ -18,10 +20,45 @@ const Index = () => {
     handleKeepAction,
     handleDeleteAction,
     isUpdating,
+    handleSearch
   } = useBastions(email);
+
+  const handleLogin = async (userEmail: string) => {
+    setIsAuthenticating(true);
+    
+    try {
+      const isAuthenticated = await api.authenticateUser(userEmail);
+      
+      if (isAuthenticated) {
+        setEmail(userEmail);
+        toast({
+          title: "Connexion réussie",
+          description: `Bienvenue, ${userEmail}`,
+        });
+      } else {
+        toast({
+          title: "Erreur d'authentification",
+          description: "Email non reconnu",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la connexion",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
 
   const handleLogout = () => {
     setEmail(null);
+    toast({
+      title: "Déconnexion",
+      description: "Vous avez été déconnecté avec succès",
+    });
   };
 
   return (
@@ -51,7 +88,7 @@ const Index = () => {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {!email ? (
           <div className="py-10">
-            <EmailLogin onLogin={setEmail} />
+            <EmailLogin onLogin={handleLogin} isLoading={isAuthenticating} />
           </div>
         ) : (
           <div className="space-y-8">
@@ -74,7 +111,11 @@ const Index = () => {
                 </div>
                 
                 <div className="bg-white p-6 rounded-lg shadow border border-slate-100">
-                  <BastionHistory bastions={bastionHistory} />
+                  <BastionHistory 
+                    bastions={bastionHistory} 
+                    onSearch={handleSearch}
+                    isLoading={isLoading}
+                  />
                 </div>
               </>
             )}

@@ -9,18 +9,19 @@ export const useBastions = (email: string | null) => {
   const queryClient = useQueryClient();
   const [selectedBastion, setSelectedBastion] = useState<BastionDto | null>(null);
   const [ritmNumber, setRitmNumber] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Requête pour récupérer les bastions en attente
-  const pendingBastions = useQuery({
+  const pendingBastionsQuery = useQuery({
     queryKey: ["pendingBastions", email],
     queryFn: () => (email ? api.getPendingBastions(email) : Promise.resolve([])),
     enabled: !!email,
   });
 
   // Requête pour récupérer l'historique des bastions
-  const bastionHistory = useQuery({
-    queryKey: ["bastionHistory", email],
-    queryFn: () => (email ? api.getBastionHistory(email) : Promise.resolve([])),
+  const bastionHistoryQuery = useQuery({
+    queryKey: ["bastionHistory", email, searchQuery],
+    queryFn: () => (email ? api.searchBastionHistory(email, searchQuery) : Promise.resolve([])),
     enabled: !!email,
   });
 
@@ -80,11 +81,15 @@ export const useBastions = (email: string | null) => {
     updateBastionMutation.mutate(actionRequest);
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return {
-    pendingBastions: pendingBastions.data || [],
-    bastionHistory: bastionHistory.data || [],
-    isLoading: pendingBastions.isLoading || bastionHistory.isLoading,
-    isError: pendingBastions.isError || bastionHistory.isError,
+    pendingBastions: pendingBastionsQuery.data || [],
+    bastionHistory: bastionHistoryQuery.data || [],
+    isLoading: pendingBastionsQuery.isLoading || bastionHistoryQuery.isLoading,
+    isError: pendingBastionsQuery.isError || bastionHistoryQuery.isError,
     selectedBastion,
     setSelectedBastion,
     ritmNumber,
@@ -92,5 +97,6 @@ export const useBastions = (email: string | null) => {
     handleKeepAction,
     handleDeleteAction,
     isUpdating: updateBastionMutation.isPending,
+    handleSearch,
   };
 };
