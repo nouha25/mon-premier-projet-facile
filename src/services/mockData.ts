@@ -1,4 +1,3 @@
-
 import { BastionDto, ActionRequest, BastionAction } from "../types";
 
 // Utilisateurs fictifs
@@ -8,30 +7,73 @@ export const mockUsers = [
   { email: "charlie@example.com", name: "Charlie Durand" },
 ];
 
-// Bastions en attente
+// Mise à jour des données fictives pour inclure des ressources de différentes plateformes
 export const mockPendingBastions: BastionDto[] = [
   { 
     bastionId: "bastion-001", 
-    name: "Bastion-Production-EU", 
+    name: "Azure-Bastion-Production-EU", 
     subscription: "Azure-Prod-EU-West", 
-    status: "Pending" 
+    status: "Pending",
+    platform: "Azure"
   },
   { 
     bastionId: "bastion-002", 
-    name: "Bastion-Dev-EU", 
+    name: "Azure-Bastion-Dev-EU", 
     subscription: "Azure-Dev-EU-West", 
-    status: "Pending" 
+    status: "Pending",
+    platform: "Azure" 
   },
   { 
-    bastionId: "bastion-003", 
-    name: "Bastion-Test-EU", 
-    subscription: "Azure-Test-EU-West", 
-    status: "Pending" 
+    bastionId: "instance-003", 
+    name: "AWS-EC2-Test-US", 
+    subscription: "AWS-Test-US-East", 
+    status: "Pending",
+    platform: "AWS" 
+  },
+  { 
+    bastionId: "vm-004", 
+    name: "GCP-VM-Prod-US", 
+    subscription: "GCP-Prod-US", 
+    status: "Pending",
+    platform: "GCP" 
+  },
+  { 
+    bastionId: "instance-005", 
+    name: "AWS-EC2-Dev-US", 
+    subscription: "AWS-Dev-US", 
+    status: "Pending",
+    platform: "AWS" 
   },
 ];
 
-// Historique des actions
+// Mise à jour de l'historique des bastions
 export const mockBastionHistory: BastionDto[] = [
+  { 
+    bastionId: "bastion-006", 
+    name: "Azure-Bastion-Prod-US", 
+    subscription: "Azure-Prod-US-East", 
+    status: "Keep",
+    platform: "Azure",
+    ritm: "RITM000123",
+    actionDate: "2025-05-15T10:30:00Z"
+  },
+  { 
+    bastionId: "instance-007", 
+    name: "AWS-EC2-Dev-US", 
+    subscription: "AWS-Dev-US-East", 
+    status: "Delete",
+    platform: "AWS",
+    actionDate: "2025-05-14T14:20:00Z"
+  },
+  { 
+    bastionId: "vm-008", 
+    name: "GCP-VM-Prod-Asia", 
+    subscription: "GCP-Prod-Asia", 
+    status: "Keep",
+    platform: "GCP",
+    ritm: "RITM000124",
+    actionDate: "2025-05-12T09:15:00Z"
+  },
   { 
     bastionId: "bastion-004", 
     name: "Bastion-Prod-US", 
@@ -176,16 +218,59 @@ export const mockBastionActions: BastionAction[] = [
 
 // Souscriptions
 export const mockSubscriptions = [
+  // Azure subscriptions
   "Azure-Prod-EU-West",
   "Azure-Dev-EU-West",
   "Azure-Test-EU-West",
   "Azure-Prod-US-East",
   "Azure-Dev-US-East",
   "Azure-Prod-Asia",
-  "Azure-Archive",
-  "Azure-Temp",
-  "Azure-Finance",
-  "Azure-HR",
-  "Azure-Marketing",
-  "Azure-Sales"
+  // AWS subscriptions
+  "AWS-Prod-EU",
+  "AWS-Dev-EU",
+  "AWS-Test-EU",
+  "AWS-Prod-US-East",
+  "AWS-Dev-US",
+  "AWS-Prod-Asia",
+  // GCP subscriptions
+  "GCP-Prod-EU",
+  "GCP-Dev-EU",
+  "GCP-Test-EU",
+  "GCP-Prod-US",
+  "GCP-Dev-US",
+  "GCP-Prod-Asia",
+];
+
+// Utilisateurs Microsoft AD fictifs
+export const mockMicrosoftUsers = [
+  {
+    email: "sophie.martin@entreprise.com",
+    name: "Sophie Martin",
+    role: "Administrateur Cloud",
+    avatar: "https://i.pravatar.cc/150?img=32"
+  },
+  {
+    email: "thomas.dubois@entreprise.com",
+    name: "Thomas Dubois",
+    role: "Développeur DevOps",
+    avatar: "https://i.pravatar.cc/150?img=53"
+  },
+  {
+    email: "emma.bernard@entreprise.com",
+    name: "Emma Bernard",
+    role: "Architecte Cloud",
+    avatar: "https://i.pravatar.cc/150?img=47"
+  },
+  {
+    email: "lucas.petit@entreprise.com",
+    name: "Lucas Petit",
+    role: "Ingénieur Sécurité",
+    avatar: "https://i.pravatar.cc/150?img=58"
+  },
+  {
+    email: "chloe.rousseau@entreprise.com",
+    name: "Chloé Rousseau",
+    role: "Chef de Projet Cloud",
+    avatar: "https://i.pravatar.cc/150?img=29"
+  }
 ];

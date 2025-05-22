@@ -4,6 +4,7 @@ export interface BastionDto {
   name: string;
   subscription: string;
   status: string;
+  platform?: "Azure" | "AWS" | "GCP"; // Ajout pour identifier la plateforme
   ritm?: string; // Pour stocker le numéro RITM si "keep" est choisi
   userEmail?: string; // Pour identifier qui a effectué l'action
   actionDate?: string; // Date de l'action
@@ -23,7 +24,9 @@ export interface ActionRequest {
 
 export interface User {
   email: string;
-  name?: string;
+  name: string;
+  role?: string;
+  avatar?: string;
 }
 
 // Nouvelle interface pour le suivi des actions sur un bastion
