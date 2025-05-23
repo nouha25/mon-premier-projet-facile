@@ -1,6 +1,7 @@
 import axios from "axios";
-import { BastionDto, ActionRequest, BastionAction } from "../types";
-import { mockPendingBastions, mockBastionHistory, mockColleagueHistory, mockSubscriptions, mockBastionActions } from "./mockData";
+import { BastionDto, ActionRequest, BastionAction, Campaign, AdminStats } from "../types";
+import { mockPendingBastions, mockBastionHistory, mockColleagueHistory, mockSubscriptions, 
+  mockBastionActions, mockConflictingBastions, mockCampaigns, mockCompletedCampaigns } from "./mockData";
 import { toast } from "@/hooks/use-toast";
 
 // TODO: Remplacer par l'URL réelle de votre API quand elle sera disponible
@@ -122,6 +123,98 @@ export const api = {
     } else {
       const response = await axios.get(`${API_URL}/Bastions/user/${email}/personal-history/search?query=${query}`);
       return response.data;
+    }
+  },
+
+  // NOUVELLES FONCTIONS POUR L'ADMINISTRATION
+
+  // Récupérer les statistiques admin
+  getAdminStats: async (): Promise<AdminStats> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Statistiques simulées basées sur les campagnes actives
+      const activeCampaign = mockCampaigns.find(campaign => campaign.status === "active");
+      
+      if (activeCampaign) {
+        return {
+          pendingCount: activeCampaign.pendingBastions,
+          conflictCount: activeCampaign.conflictingBastions,
+          totalCount: activeCampaign.totalBastions,
+          resolvedCount: activeCampaign.resolvedBastions
+        };
+      }
+      
+      // Valeurs par défaut si aucune campagne active
+      return {
+        pendingCount: mockPendingBastions.length,
+        conflictCount: mockConflictingBastions.length,
+        totalCount: mockPendingBastions.length + mockConflictingBastions.length + 17, // 17 = hypothétiques bastions déjà résolus
+        resolvedCount: 17
+      };
+    } else {
+      const response = await axios.get(`${API_URL}/Admin/stats`);
+      return response.data;
+    }
+  },
+
+  // Récupérer la campagne active
+  getActiveCampaign: async (): Promise<Campaign> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      const activeCampaign = mockCampaigns.find(campaign => campaign.status === "active");
+      return activeCampaign || mockCampaigns[0];
+    } else {
+      const response = await axios.get(`${API_URL}/Admin/campaigns/active`);
+      return response.data;
+    }
+  },
+
+  // Récupérer toutes les campagnes
+  getAllCampaigns: async (): Promise<Campaign[]> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 700));
+      return [...mockCampaigns, ...mockCompletedCampaigns];
+    } else {
+      const response = await axios.get(`${API_URL}/Admin/campaigns`);
+      return response.data;
+    }
+  },
+
+  // Récupérer les bastions en conflit
+  getConflictingBastions: async (): Promise<BastionDto[]> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return mockConflictingBastions;
+    } else {
+      const response = await axios.get(`${API_URL}/Admin/bastions/conflicting`);
+      return response.data;
+    }
+  },
+
+  // Récupérer tous les bastions nécessitant une action admin
+  getBastionsNeedingAction: async (): Promise<BastionDto[]> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 700));
+      // Combiner les bastions en attente et en conflit
+      return [...mockPendingBastions, ...mockConflictingBastions];
+    } else {
+      const response = await axios.get(`${API_URL}/Admin/bastions/needing-action`);
+      return response.data;
+    }
+  },
+
+  // Prendre une décision admin sur un bastion
+  takeAdminDecision: async (actionRequest: ActionRequest): Promise<void> => {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      console.log("Admin decision:", actionRequest);
+      toast({
+        title: "Décision administrative",
+        description: `Action '${actionRequest.action === "keep" ? "conserver" : "supprimer"}' appliquée au bastion ${actionRequest.bastionId}`,
+      });
+    } else {
+      await axios.post(`${API_URL}/Admin/bastions/decision`, actionRequest);
     }
   }
 };

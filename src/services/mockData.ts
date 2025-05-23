@@ -1,48 +1,138 @@
-import { BastionDto, ActionRequest, BastionAction } from "../types";
+import { BastionDto, ActionRequest, BastionAction, Campaign, User } from "../types";
 
-// Utilisateurs fictifs
-export const mockUsers = [
-  { email: "alice@example.com", name: "Alice Martin" },
-  { email: "bob@example.com", name: "Bob Dupont" },
-  { email: "charlie@example.com", name: "Charlie Durand" },
+// Utilisateurs fictifs avec rôles
+export const mockUsers: User[] = [
+  { 
+    email: "sophie.martin@entreprise.com", 
+    name: "Sophie Martin", 
+    role: "Administrateur Cloud", 
+    avatar: "https://i.pravatar.cc/150?img=32",
+    isAdmin: true
+  },
+  { 
+    email: "thomas.dubois@entreprise.com", 
+    name: "Thomas Dubois", 
+    role: "Développeur DevOps", 
+    avatar: "https://i.pravatar.cc/150?img=53" 
+  },
+  { 
+    email: "emma.bernard@entreprise.com", 
+    name: "Emma Bernard", 
+    role: "Architecte Cloud", 
+    avatar: "https://i.pravatar.cc/150?img=47" 
+  },
+  { 
+    email: "lucas.petit@entreprise.com", 
+    name: "Lucas Petit", 
+    role: "Ingénieur Sécurité", 
+    avatar: "https://i.pravatar.cc/150?img=58" 
+  },
+  { 
+    email: "chloe.rousseau@entreprise.com", 
+    name: "Chloé Rousseau", 
+    role: "Chef de Projet Cloud", 
+    avatar: "https://i.pravatar.cc/150?img=29" 
+  }
 ];
 
-// Mise à jour des données fictives pour inclure des ressources de différentes plateformes
+// Campagnes fictives
+export const mockCampaigns: Campaign[] = [
+  {
+    id: "campaign-2025-05",
+    name: "Revue des ressources - Mai 2025",
+    startDate: "2025-05-01T00:00:00Z",
+    endDate: "2025-05-31T23:59:59Z",
+    status: "active",
+    totalBastions: 24,
+    pendingBastions: 5,
+    conflictingBastions: 2,
+    resolvedBastions: 17
+  },
+  {
+    id: "campaign-2025-04",
+    name: "Revue des ressources - Avril 2025",
+    startDate: "2025-04-01T00:00:00Z",
+    endDate: "2025-04-30T23:59:59Z",
+    status: "completed",
+    totalBastions: 20,
+    pendingBastions: 0,
+    conflictingBastions: 0,
+    resolvedBastions: 20
+  },
+  {
+    id: "campaign-2025-06",
+    name: "Revue des ressources - Juin 2025",
+    startDate: "2025-06-01T00:00:00Z",
+    endDate: "2025-06-30T23:59:59Z",
+    status: "planned",
+    totalBastions: 18,
+    pendingBastions: 18,
+    conflictingBastions: 0,
+    resolvedBastions: 0
+  }
+];
+
+// Mise à jour des données fictives pour inclure des ressources de différentes plateformes et campagnes
 export const mockPendingBastions: BastionDto[] = [
   { 
     bastionId: "bastion-001", 
     name: "Azure-Bastion-Production-EU", 
     subscription: "Azure-Prod-EU-West", 
     status: "Pending",
-    platform: "Azure"
+    platform: "Azure",
+    campaignId: "campaign-2025-05"
   },
   { 
     bastionId: "bastion-002", 
     name: "Azure-Bastion-Dev-EU", 
     subscription: "Azure-Dev-EU-West", 
     status: "Pending",
-    platform: "Azure" 
+    platform: "Azure",
+    campaignId: "campaign-2025-05"
   },
   { 
     bastionId: "instance-003", 
     name: "AWS-EC2-Test-US", 
     subscription: "AWS-Test-US-East", 
     status: "Pending",
-    platform: "AWS" 
+    platform: "AWS",
+    campaignId: "campaign-2025-05"
   },
   { 
     bastionId: "vm-004", 
     name: "GCP-VM-Prod-US", 
     subscription: "GCP-Prod-US", 
     status: "Pending",
-    platform: "GCP" 
+    platform: "GCP", 
+    campaignId: "campaign-2025-05"
   },
   { 
     bastionId: "instance-005", 
     name: "AWS-EC2-Dev-US", 
     subscription: "AWS-Dev-US", 
     status: "Pending",
-    platform: "AWS" 
+    platform: "AWS",
+    campaignId: "campaign-2025-05"
+  },
+];
+
+// Bastions en conflit (opinions divergentes des utilisateurs)
+export const mockConflictingBastions: BastionDto[] = [
+  { 
+    bastionId: "conflict-001", 
+    name: "Azure-VM-Finance", 
+    subscription: "Azure-Finance", 
+    status: "Conflict",
+    platform: "Azure",
+    campaignId: "campaign-2025-05"
+  },
+  { 
+    bastionId: "conflict-002", 
+    name: "AWS-RDS-Analytics", 
+    subscription: "AWS-Analytics", 
+    status: "Conflict",
+    platform: "AWS",
+    campaignId: "campaign-2025-05"
   },
 ];
 
@@ -55,7 +145,8 @@ export const mockBastionHistory: BastionDto[] = [
     status: "Keep",
     platform: "Azure",
     ritm: "RITM000123",
-    actionDate: "2025-05-15T10:30:00Z"
+    actionDate: "2025-05-15T10:30:00Z",
+    campaignId: "campaign-2025-05"
   },
   { 
     bastionId: "instance-007", 
@@ -213,6 +304,87 @@ export const mockBastionActions: BastionAction[] = [
     userEmail: "bob@example.com",
     userName: "Bob Dupont",
     actionDate: "2025-04-28T11:20:00Z"
+  },
+  // Ajout d'actions conflictuelles
+  {
+    actionId: "action-101",
+    bastionId: "conflict-001",
+    action: "keep",
+    ritm: "RITM000130",
+    userEmail: "thomas.dubois@entreprise.com",
+    userName: "Thomas Dubois",
+    actionDate: "2025-05-16T11:30:00Z"
+  },
+  {
+    actionId: "action-102",
+    bastionId: "conflict-001",
+    action: "delete",
+    userEmail: "emma.bernard@entreprise.com",
+    userName: "Emma Bernard",
+    actionDate: "2025-05-16T14:45:00Z"
+  },
+  {
+    actionId: "action-103",
+    bastionId: "conflict-002",
+    action: "keep",
+    ritm: "RITM000131",
+    userEmail: "lucas.petit@entreprise.com",
+    userName: "Lucas Petit",
+    actionDate: "2025-05-17T09:20:00Z"
+  },
+  {
+    actionId: "action-104",
+    bastionId: "conflict-002",
+    action: "delete",
+    userEmail: "chloe.rousseau@entreprise.com",
+    userName: "Chloé Rousseau",
+    actionDate: "2025-05-17T10:15:00Z"
+  },
+  // Actions admin pour résolution de conflits
+  {
+    actionId: "action-201",
+    bastionId: "resolved-conflict-001",
+    action: "keep",
+    ritm: "RITM000140",
+    userEmail: "sophie.martin@entreprise.com",
+    userName: "Sophie Martin",
+    actionDate: "2025-04-22T15:30:00Z",
+    isAdmin: true
+  },
+  {
+    actionId: "action-202",
+    bastionId: "resolved-conflict-002",
+    action: "delete",
+    userEmail: "sophie.martin@entreprise.com",
+    userName: "Sophie Martin",
+    actionDate: "2025-04-23T11:45:00Z",
+    isAdmin: true
+  }
+];
+
+// Historique des campagnes terminées
+export const mockCompletedCampaigns: Campaign[] = [
+  {
+    id: "campaign-2025-03",
+    name: "Revue des ressources - Mars 2025",
+    startDate: "2025-03-01T00:00:00Z",
+    endDate: "2025-03-31T23:59:59Z",
+    status: "completed",
+    totalBastions: 22,
+    pendingBastions: 0,
+    conflictingBastions: 0,
+    resolvedBastions: 22
+  },
+  {
+    id: "campaign-2025-02",
+    name: "Revue des ressources - Février 2025",
+    startDate: "2025-02-01T00:00:00Z",
+    endDate: "2025-02-28T23:59:59Z",
+    status: "completed",
+    totalBastions: 19,
+    pendingBastions: 0,
+    conflictingBastions: 0,
+    resolvedBastions: 19
   }
 ];
 
@@ -247,7 +419,8 @@ export const mockMicrosoftUsers = [
     email: "sophie.martin@entreprise.com",
     name: "Sophie Martin",
     role: "Administrateur Cloud",
-    avatar: "https://i.pravatar.cc/150?img=32"
+    avatar: "https://i.pravatar.cc/150?img=32",
+    isAdmin: true
   },
   {
     email: "thomas.dubois@entreprise.com",

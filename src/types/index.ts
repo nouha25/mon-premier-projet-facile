@@ -4,10 +4,11 @@ export interface BastionDto {
   name: string;
   subscription: string;
   status: string;
-  platform?: "Azure" | "AWS" | "GCP"; // Ajout pour identifier la plateforme
-  ritm?: string; // Pour stocker le numéro RITM si "keep" est choisi
-  userEmail?: string; // Pour identifier qui a effectué l'action
-  actionDate?: string; // Date de l'action
+  platform?: "Azure" | "AWS" | "GCP";
+  ritm?: string;
+  userEmail?: string;
+  actionDate?: string;
+  campaignId?: string; // Ajout pour regrouper les bastions par campagne
 }
 
 export interface ContactDto {
@@ -18,8 +19,9 @@ export interface ContactDto {
 export interface ActionRequest {
   bastionId: string;
   action: "keep" | "delete";
-  ritm?: string; // Obligatoire si action = "keep"
-  userEmail: string; // Pour associer l'action à un utilisateur
+  ritm?: string;
+  userEmail: string;
+  isAdmin?: boolean; // Pour identifier les actions admin
 }
 
 export interface User {
@@ -27,9 +29,9 @@ export interface User {
   name: string;
   role?: string;
   avatar?: string;
+  isAdmin?: boolean; // Ajout d'un flag admin
 }
 
-// Nouvelle interface pour le suivi des actions sur un bastion
 export interface BastionAction {
   actionId: string;
   bastionId: string;
@@ -38,4 +40,28 @@ export interface BastionAction {
   userEmail: string;
   userName?: string;
   actionDate: string;
+  isAdmin?: boolean; // Pour distinguer les actions admin
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: "active" | "completed" | "planned";
+  totalBastions: number;
+  pendingBastions: number;
+  conflictingBastions: number;
+  resolvedBastions: number;
+}
+
+// Ajout des états possibles pour un bastion
+export type BastionStatus = "Pending" | "Keep" | "Delete" | "Conflict" | "AdminKeep" | "AdminDelete";
+
+// Interface pour les statistiques administrateur
+export interface AdminStats {
+  pendingCount: number;
+  conflictCount: number;
+  totalCount: number;
+  resolvedCount: number;
 }
